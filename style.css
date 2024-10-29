@@ -1,0 +1,145 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0e0e0; /* Soft background color */
+    margin: 0; /* Remove default margin */
+}
+
+#start-page, #info-bar, #game-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#start-page {
+    flex-direction: column;
+    height: 100vh;
+    text-align: center;
+}
+
+/* Improved styling for the info bar */
+#info-bar {
+    background-color: #388E3C; /* Darker shique green for info bar */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding for spacing */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width */
+    position: fixed; /* Fixed position at the top */
+    top: 0; /* Stick to the top */
+    left: 0; /* Align to the left */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 1000; /* Make sure it stays on top */
+}
+
+/* Align items within the info bar */
+#info-bar span, #info-bar button {
+    margin: 0 15px; /* Margin between items */
+    font-size: 18px; /* Larger font size */
+}
+
+/* Styling for the pause button */
+#pause-btn {
+    background-color: #4CAF50; /* Bright green for visibility */
+    border: none; /* Remove default border */
+    color: white; /* White text color */
+    padding: 10px 15px; /* Padding for button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+/* Change button color on hover */
+#pause-btn:hover {
+    background-color: #45A049; /* Darker shade on hover */
+}
+
+/* Improved game area */
+#game-area {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    border: 2px solid #333; /* Slightly thicker border */
+    background-color: #f0f0f0;
+    margin-top: 70px; /* Space for the fixed info bar */
+    border-radius: 8px; /* Rounded corners for the game area */
+    box-shadow: 0 4px 15px rgba(75, 255, 75, 0.1); /* Shadow for depth */
+    display: flex; /* Make game area a flex container */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    margin: 70px auto 10px auto; /* 70px top, auto sides, 10px bottom */
+}
+
+/* Food styles */
+.food {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+/* Different types of food */
+.food.type1 {
+    background-color: blue;
+}
+
+.food.type2 {
+    background-color: red;
+}
+
+/* Worm styles */
+.worm {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    transition: transform 0.05s linear;
+}
+
+/* Obstacle styles */
+.obstacle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: green;
+}
+
+#start-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full height of the viewport */
+    background-color: #388E3C; /* Darker shique green for the start page */
+    color: white; /* White text color */
+    text-align: center; /* Center text alignment */
+    padding: 20px; /* Padding for spacing */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+#start-page h1 {
+    font-size: 2.5em; /* Larger title size */
+    margin-bottom: 20px; /* Space below title */
+}
+
+#start-page p {
+    font-size: 1.2em; /* Slightly larger paragraph text */
+    margin: 10px 0; /* Space above and below paragraphs */
+}
+
+#start-btn {
+    background-color: #4CAF50; /* Bright green for visibility */
+    border: none; /* Remove default border */
+    color: white; /* White text color */
+    padding: 10px 20px; /* Padding for button */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1.2em; /* Larger button text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+/* Change button color on hover */
+#start-btn:hover {
+    background-color: #45A049; /* Darker shade on hover */
+}
