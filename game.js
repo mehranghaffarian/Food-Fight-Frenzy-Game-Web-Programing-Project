@@ -77,6 +77,10 @@ document.addEventListener("DOMContentLoaded", function () {
             worm.style.width = "5px"; // Original size of the worm
             worm.style.height = "15px"; // Original size of the worm
             worm.style.backgroundColor = "black"; // Color of the worm
+            worm.style.position = "absolute"; // Make worm position absolute
+            worm.style.left = "35%";
+            worm.style.top = "15%";
+
             placeElementRandomly(wormContainer, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')], "0px");
             
             wormContainer.style.position = "absolute";
@@ -96,11 +100,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Function to handle killing a worm
-    function killWorm(worm) {
+    function killWorm(worm, wormContainer) {
         score += 8; // Increase score by 8 points
         scoreDisplay.innerText = "Score: " + score; // Update score display
         worm.remove(); // Remove the worm from the game
-        worm.parentNode.remove(); // Remove the wormContainer from the game
+        wormContainer.remove(); // Remove the wormContainer from the game
         worms = worms.filter(w => w !== worm); // Remove the worm from the worms array
     }
 
