@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let wormSpeed = 2;
     let foodCountType1 = 6;
     let foodCountType2 = 4;
-    let wormSpawnInterval =  Math.random() * 2000 + 5000;
+    let wormSpawnInterval =  Math.random() * 2000 + 1000;
     let wormSpawnTimer;
 
     const gameArea = document.getElementById("game-area");
@@ -55,11 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < count; i++) {
             let food = document.createElement("div");
             food.classList.add("food", type);
-            food.style.left = Math.random() * 380 + "px";
-            food.style.top = Math.random() * 580 + "px";
+            food.style.width = "15px";
+            food.style.height = "15px";
             gameArea.appendChild(food);
-            foodItems.push(food);
             console.log("Food created:", food); // Debugging: log food creation
+
+            placeElementRandomly(food, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')]);
+            foodItems.push(food);
         }
     }
 
@@ -67,20 +69,23 @@ document.addEventListener("DOMContentLoaded", function () {
         wormSpawnTimer = setInterval(() => {
             let wormContainer = document.createElement("div");
             wormContainer.classList.add("worm-container");
-            wormContainer.style.position = "absolute";
-            wormContainer.style.width = "5px"; // Larger width for clickable area
+            wormContainer.style.width = "20px"; // Larger width for clickable area
             wormContainer.style.height = "20px"; // Larger height for clickable area
-            wormContainer.style.left = Math.random() * 380 + "px";
-            wormContainer.style.top = "0px";
-
+            
             let worm = document.createElement("div");
             worm.classList.add("worm");
-            worm.style.width = "10px"; // Original size of the worm
-            worm.style.height = "10px"; // Original size of the worm
+            worm.style.width = "5px"; // Original size of the worm
+            worm.style.height = "15px"; // Original size of the worm
             worm.style.backgroundColor = "black"; // Color of the worm
-    
+            placeElementRandomly(wormContainer, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')], "0px");
+
+            wormContainer.style.top = "0px";
             wormContainer.appendChild(worm);
             gameArea.appendChild(wormContainer);
+            
+            let rect = wormContainer.getBoundingClientRect();
+            worm.style.left = rect.left;
+            worm.style.top = "0px";
             worms.push(worm);
 
             // Add click event listener to each worm
@@ -94,11 +99,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Function to handle killing a worm
-    function killWorm(worm, wormContainer) {
+    function killWorm(worm) {
         score += 8; // Increase score by 8 points
         scoreDisplay.innerText = "Score: " + score; // Update score display
         worm.remove(); // Remove the worm from the game
-        wormContainer.remove(); // Remove the wormContainer from the game
+        worm.parentNode.remove(); // Remove the wormContainer from the game
         worms = worms.filter(w => w !== worm); // Remove the worm from the worms array
     }
 
@@ -112,9 +117,9 @@ document.addEventListener("DOMContentLoaded", function () {
             obstacle.style.height = "10px"; // Height of obstacle
             obstacle.style.backgroundColor = "green"; // Color of the obstacle
             obstacle.style.position = "absolute";
-            obstacle.style.left = Math.random() * (gameArea.offsetWidth - 50) + "px";
-            obstacle.style.top = Math.random() * (gameArea.offsetHeight - 50) + "px";
             gameArea.appendChild(obstacle);
+
+            placeElementRandomly(obstacle, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')]);
         }
     }
 
@@ -132,8 +137,14 @@ document.addEventListener("DOMContentLoaded", function () {
             let dist = Math.sqrt(dx * dx + dy * dy);
     
             // Move worm towards food
-            worm.style.left = (worm.offsetLeft + (dx / dist) * wormSpeed) + "px";
-            worm.style.top = (worm.offsetTop + (dy / dist) * wormSpeed) + "px";
+            let left = (worm.offsetLeft + (dx / dist) * wormSpeed) + "px";
+            let top = (worm.offsetTop + (dy / dist) * wormSpeed) + "px";
+            let wormParent = worm.parentNode;
+            
+            wormParent.style.left = left;
+            wormParent.style.top = top;
+            worm.style.left = left;
+            worm.style.top = top;
     
             // Check if worm eats the food
             checkWormEating(worm, closestFood, wormMovement);
@@ -146,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let dy = worm.offsetTop - food.offsetTop;
         let dist = Math.sqrt(dx * dx + dy * dy);
     
-        if (dist < 10) {  // Adjust this threshold based on your game scale
+        if (dist < 12) {  // Adjust this threshold based on your game scale
             // Worm eats the food
             food.remove();
             foodItems = foodItems.filter(f => f !== food); // Remove food from list
@@ -229,5 +240,37 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         isPaused = !isPaused; // Toggle the pause state
     }
+
+    function isOverlapping(element1, element2, minDistance = 20) {
+        const rect1 = element1.getBoundingClientRect();
+        const rect2 = element2.getBoundingClientRect();
+    
+        const dx = rect1.left - rect2.left;
+        const dy = rect1.top - rect2.top;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+    
+        return distance < minDistance;
+    }
+    
+    function placeElementRandomly(element, container, existingElements, top = null) {
+        let positionValid = false;
+        let attempts = 0;
+    
+        while (!positionValid && attempts < 100) { // Limit to avoid infinite loops
+            element.style.left = Math.random() * (container.offsetWidth - element.offsetWidth) + "px";
+            // Set the top position randomly or with provided value
+            element.style.top = top !== null ? top : Math.random() * (container.offsetHeight - element.offsetHeight) + "px";
+
+            positionValid = true;
+            for (let existing of existingElements) {
+                if (isOverlapping(element, existing)) {
+                    positionValid = false;
+                    break;
+                }
+            }
+            attempts++;
+        }
+    }
+    
     document.getElementById("pause-btn").addEventListener("click", togglePause);
 });
