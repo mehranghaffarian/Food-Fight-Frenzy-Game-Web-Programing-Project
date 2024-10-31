@@ -78,14 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
             worm.style.height = "15px"; // Original size of the worm
             worm.style.backgroundColor = "black"; // Color of the worm
             placeElementRandomly(wormContainer, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')], "0px");
-
-            wormContainer.style.top = "0px";
+            
+            wormContainer.style.position = "absolute";
             wormContainer.appendChild(worm);
             gameArea.appendChild(wormContainer);
-            
-            let rect = wormContainer.getBoundingClientRect();
-            worm.style.left = rect.left;
-            worm.style.top = "0px";
+
             worms.push(worm);
 
             // Add click event listener to each worm
@@ -94,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             moveWorm(worm);
-            console.log("Worm spawned:", worm); // Debugging: log worm creation
+            console.log("WormContainer spawned:", wormContainer); // Debugging: log worm creation
         }, wormSpawnInterval);
     }
 
@@ -126,28 +123,22 @@ document.addEventListener("DOMContentLoaded", function () {
     function moveWorm(worm) {
         // Move the worm towards the closest food item
         const wormMovement = setInterval(() => {
-            let closestFood = getClosestFood(worm);
+            let wormContainer = worm.parentNode;
+            let closestFood = getClosestFood(wormContainer);
             if (!closestFood) {
                 clearInterval(wormMovement);
                 return;
             }
     
-            let dx = closestFood.offsetLeft - worm.offsetLeft;
-            let dy = closestFood.offsetTop - worm.offsetTop;
+            let dx = closestFood.offsetLeft - wormContainer.offsetLeft;
+            let dy = closestFood.offsetTop - wormContainer.offsetTop;
             let dist = Math.sqrt(dx * dx + dy * dy);
-    
-            // Move worm towards food
-            let left = (worm.offsetLeft + (dx / dist) * wormSpeed) + "px";
-            let top = (worm.offsetTop + (dy / dist) * wormSpeed) + "px";
-            let wormParent = worm.parentNode;
             
-            wormParent.style.left = left;
-            wormParent.style.top = top;
-            worm.style.left = left;
-            worm.style.top = top;
-    
+            wormContainer.style.left = (wormContainer.offsetLeft + (dx / dist) * wormSpeed) + "px";
+            wormContainer.style.top = (wormContainer.offsetTop + (dy / dist) * wormSpeed) + "px";;
+            
             // Check if worm eats the food
-            checkWormEating(worm, closestFood, wormMovement);
+            checkWormEating(wormContainer, closestFood, wormMovement);
         }, 50);
         worm.moveInterval = wormMovement; 
     }
@@ -228,11 +219,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isPaused) {
             // Resume the game
             startTimer(); // Restart the timer
+            spawnWorms();
             worms.forEach(worm => moveWorm(worm)); // Resume moving worms
         } else {
             // Pause the game
             clearInterval(interval); // Stop the timer
-            clearInterval(wormSpawnTimer); // Stop worms from spawning
+            clearInterval(wormSpawnTimer);
             // You may also want to stop the movement of worms if needed
             worms.forEach(worm => {
                 clearInterval(worm.moveInterval); // Clear the move interval for each worm
