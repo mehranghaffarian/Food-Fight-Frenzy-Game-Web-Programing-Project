@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     let isPaused = false;
     let score = 0;
-    let timer = 30;
+    let timer = 3;
+    const secondLevelTime = 60;
     let level = 1;
     let interval;
     let foodItems = [];
@@ -133,6 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function moveWorm(worm) {
         // Move the worm towards the closest food item
         const wormMovement = setInterval(() => {
+            if(isPaused)
+                return;
+
             let wormContainer = worm.parentNode;
             let closestFood = getClosestFood(wormContainer);
             if (!closestFood) {
@@ -235,18 +239,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         return closest;
     }
-    
 
     function endGame() {
         if (foodItems.length > 0 && level == 1) {
-            // If there is still food left, go to the next level instead of ending the game
             nextLevel();
         } else {
             clearInterval(interval);
             clearInterval(wormSpawnTimer);
-            alert("Game is Over! Your score: " + score);
             
-            // Optionally save the score to localStorage
             let highscore1 = localStorage.getItem("highscore1") || 0;
             let highscore2 = localStorage.getItem("highscore2") || 0;
             
@@ -255,9 +255,25 @@ document.addEventListener("DOMContentLoaded", function () {
             } else if (score > highscore2 && level === 2) {
                 localStorage.setItem("highscore2", score);
             }
-            window.location.href = "index.html"; // Redirect to start page
+            
+            // Show the final score in the dialog box
+            document.getElementById("final-score").innerText = score;
+            
+            // Display the dialog box
+            document.getElementById("end-game-dialog").style.display = "flex";
+            
+            // Set up the "Restart" button
+            document.getElementById("restart-btn").addEventListener("click", function () {
+                location.reload(); // Reloads the page to restart the game
+            });
+            
+            // Set up the "Exit" button
+            document.getElementById("exit-btn").addEventListener("click", function () {
+                window.location.href = "index.html"; // Redirects to the start page or another page
+            });
         }
     }
+    
 
     function nextLevel() {
         // Increase the level and difficulty
@@ -265,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function () {
         levelDisplay.innerText = "Level: " + level;
         
         // Reset the timer
-        timer = 60;
+        timer = secondLevelTime;
         timerDisplay.innerText = "Time: " + timer;
         
         // Increase the game difficulty

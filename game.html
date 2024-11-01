@@ -12,9 +12,16 @@
         <button id="pause-btn">Pause</button>
         <span id="score">Score: 0</span>
         <span id="level">Level 1</span>
-    </div>
+    </div>    
     <div id="game-area">
             <!-- Food, worms, and obstacles will be dynamically added here -->
+    </div>
+    <div id="end-game-dialog" style="display: none;">
+        <div id="dialog-content">
+            <p>Game Over! Your score: <span id="final-score"></span></p>
+            <button id="restart-btn">Restart</button>
+            <button id="exit-btn">Exit</button>
+        </div>
     </div>
     <script src="game.js"></script>
 </body>
