@@ -9,8 +9,17 @@
 <body>
     <div id="start-page">
         <h1>Food Fight Frenzy</h1>
-        <p>Highest Score Level 1: <span id="highscore1">0</span></p>
-        <p>Highest Score Level 2: <span id="highscore2">0</span></p>
+        <div>
+            <label>
+                <input type="radio" id="level1" name="level" value="1" checked>
+                Level 1 
+            </label>
+            <label>
+                <input type="radio" id="level2" name="level" value="2">
+                Level 2
+            </label>
+        </div>
+        <p>Highest Score: <span id="highestScore">0</span></p>
         <button id="start-btn">Start Game</button>
     </div>
     <script src="start.js"></script>

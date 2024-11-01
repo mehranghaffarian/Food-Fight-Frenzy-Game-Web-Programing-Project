@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const scoreDisplay = document.getElementById("score");
     const timerDisplay = document.getElementById("timer");
     const levelDisplay = document.getElementById("level");
+    const pauseButton = document.getElementById("pause-btn");
 
     // Initialize the game when the page is loaded
     initializeGame();
@@ -25,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
         scoreDisplay.innerText = "Score: " + score;
         timerDisplay.innerText = "Time: " + timer;
         levelDisplay.innerText = "Level: " + level;
+
+        if(localStorage.getItem("selectedLevel") == 2)
+            nextLevel();
 
         // Generate food items and start the timer
         generateFoodItems();
@@ -111,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to generate obstacles
     function generateObstacles() {
-        let obstacleCount = Math.floor(Math.random() * 4) + 10; // Random count of obstacles between 1 and 4
+        let obstacleCount = Math.floor(Math.random() * 4) + 1; // Random count of obstacles between 1 and 4
         for (let i = 0; i < obstacleCount; i++) {
             let obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
@@ -280,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Generate new food items and start timer again
         generateFoodItems();
+        generateObstacles();
         spawnWorms();
         startTimer();
     }
@@ -289,11 +294,11 @@ document.addEventListener("DOMContentLoaded", function () {
         wormSpawnInterval = Math.max(500, wormSpawnInterval - 200);
     
         // Increase the number of food items to spawn each level to make it harder
-        foodCountType1 += 1;
-        foodCountType2 += 1;
+        foodCountType1 = 7;
+        foodCountType2 = 5;
     
         // Increase worm movement speed slightly
-        wormSpeed += 0.5;
+        wormSpeed = 3;
     
         // Clear and reset the existing worm spawn interval with the updated, faster rate
         clearInterval(wormSpawnTimer);
@@ -309,6 +314,8 @@ document.addEventListener("DOMContentLoaded", function () {
             startTimer(); // Restart the timer
             spawnWorms();
             worms.forEach(worm => moveWorm(worm)); // Resume moving worms
+
+            pauseButton.innerText = "Pause";
         } else {
             // Pause the game
             clearInterval(interval); // Stop the timer
@@ -317,6 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
             worms.forEach(worm => {
                 clearInterval(worm.moveInterval); // Clear the move interval for each worm
             });
+            pauseButton.innerText = "Play";
         }
         isPaused = !isPaused; // Toggle the pause state
     }
@@ -360,8 +368,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
     
-    document.getElementById("pause-btn").addEventListener("click", togglePause);
+    pauseButton.addEventListener("click", togglePause);
 });
-
-
-
