@@ -1,14 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
     let isPaused = false;
     let score = 0;
-    let timer = 3;
+    let timer = 30;
     const secondLevelTime = 60;
     let level = 1;
     let interval;
     let foodItems = [];
     let worms = [];
     let obstacles = [];
-    let wormSpeed = 2;
     let foodCountType1 = 6;
     let foodCountType2 = 4;
     let wormSpawnInterval =  Math.random() * 2000 + 1000;
@@ -19,6 +18,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const timerDisplay = document.getElementById("timer");
     const levelDisplay = document.getElementById("level");
     const pauseButton = document.getElementById("pause-btn");
+
+    // Worm data structure for each type with corresponding properties
+    const wormTypes = [
+        {
+            color: "black",
+            speedLevel1: 2, // Speed at level 1 in pixels per second
+            speedLevel2: 3, // Speed at level 2 in pixels per second
+            points: 10,
+            spawnChance: 30 // Percentage chance of spawning
+        },
+        {
+            color: "red",
+            speedLevel1: 1,
+            speedLevel2: 1.5,
+            points: 5,
+            spawnChance: 30
+        },
+        {
+            color: "orange",
+            speedLevel1: 1,
+            speedLevel2: 1.5,
+            points: 3,
+            spawnChance: 40
+        }
+    ];
 
     // Initialize the game when the page is loaded
     initializeGame();
@@ -87,6 +111,25 @@ document.addEventListener("DOMContentLoaded", function () {
             worm.style.left = "35%";
             worm.style.top = "15%";
 
+            // Select a worm type based on their spawn chances
+            const spawnRoll = Math.random() * 100;
+            let cumulativeChance = 0;
+            let selectedWormType;
+
+            for (const wormType of wormTypes) {
+                cumulativeChance += wormType.spawnChance;
+                if (spawnRoll < cumulativeChance) {
+                    selectedWormType = wormType;
+                    break;
+                }
+            }
+            worm.className = `worm ${selectedWormType.color}`;
+            
+            worm.style.backgroundColor = selectedWormType.color;
+            // Set speed based on game level
+            worm.dataset.speed = level === 1 ? selectedWormType.speedLevel1 : selectedWormType.speedLevel2;
+            worm.dataset.points = selectedWormType.points;
+
             placeElementRandomly(wormContainer, gameArea, [...foodItems, ...obstacles], "0px");
             
             wormContainer.style.position = "absolute";
@@ -107,10 +150,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to handle killing a worm
     function killWorm(worm, wormContainer) {
-        score += 8; // Increase score by 8 points
+        score += parseInt(worm.dataset.points); // Increase score by 8 points
         scoreDisplay.innerText = "Score: " + score; // Update score display
-        worm.remove(); // Remove the worm from the game
-        wormContainer.remove(); // Remove the wormContainer from the game
+        worm.parentNode.remove();
         worms = worms.filter(w => w !== worm); // Remove the worm from the worms array
     }
 
@@ -158,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 dy = nearestCorner.top - wormContainer.offsetTop;
                 dist = Math.sqrt(dx * dx + dy * dy);
             }
-            
+            const wormSpeed = parseInt(worm.dataset.speed, 10);
             wormContainer.style.left = (wormContainer.offsetLeft + (dx / dist) * wormSpeed) + "px";
             wormContainer.style.top = (wormContainer.offsetTop + (dy / dist) * wormSpeed) + "px";;
             
@@ -312,6 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Increase the number of food items to spawn each level to make it harder
         foodCountType1 = 7;
         foodCountType2 = 5;
+        level = 2;
     
         // Increase worm movement speed slightly
         wormSpeed = 3;
@@ -385,4 +428,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     pauseButton.addEventListener("click", togglePause);
-});
+})

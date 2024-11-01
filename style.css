@@ -184,3 +184,16 @@ body {
     border-radius: 10px;
     text-align: center;
 }
+
+/* Specific worm types */
+.worm.black {
+    background-color: black;
+}
+
+.worm.red {
+    background-color: red;
+}
+
+.worm.orange {
+    background-color: orange;
+}
