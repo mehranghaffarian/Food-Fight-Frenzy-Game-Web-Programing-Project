@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to generate obstacles
     function generateObstacles() {
-        let obstacleCount = Math.floor(Math.random() * 4) + 1; // Random count of obstacles between 1 and 4
+        let obstacleCount = Math.floor(Math.random() * 4) + 10; // Random count of obstacles between 1 and 4
         for (let i = 0; i < obstacleCount; i++) {
             let obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
@@ -139,6 +139,17 @@ document.addEventListener("DOMContentLoaded", function () {
             let dx = closestFood.offsetLeft - wormContainer.offsetLeft;
             let dy = closestFood.offsetTop - wormContainer.offsetTop;
             let dist = Math.sqrt(dx * dx + dy * dy);
+
+            
+            // Check if worm is about to collide with an obstacle
+            let obstacle = getNearbyObstacle(wormContainer);
+            if (obstacle) {
+                // If obstacle is near, get the nearest corner of the obstacle
+                let nearestCorner = getNearestCorner(wormContainer, obstacle);
+                dx = (nearestCorner.left-10) - wormContainer.offsetLeft;
+                dy = nearestCorner.top - wormContainer.offsetTop;
+                dist = Math.sqrt(dx * dx + dy * dy);
+            }
             
             wormContainer.style.left = (wormContainer.offsetLeft + (dx / dist) * wormSpeed) + "px";
             wormContainer.style.top = (wormContainer.offsetTop + (dy / dist) * wormSpeed) + "px";;
@@ -147,6 +158,43 @@ document.addEventListener("DOMContentLoaded", function () {
             checkWormEating(wormContainer, closestFood, wormMovement);
         }, 50);
         worm.moveInterval = wormMovement; 
+    }
+
+    // Function to get the nearest obstacle to the worm if it's within collision range
+    function getNearbyObstacle(worm) {
+        for (let obstacle of obstacles) {
+            if (isOverlapping(worm, obstacle, 20)) {
+                return obstacle;
+            }
+        }
+        return null;
+    }
+
+    // Function to get the nearest corner with an offset to avoid getting stuck
+    function getNearestCorner(worm, obstacle) {
+        const wormRect = worm.parentNode.getBoundingClientRect();
+        const obstacleRect = obstacle.getBoundingClientRect();
+        const offset = 10;
+
+        // Define corners with an offset from the obstacle
+        const corners = [
+            {left: obstacleRect.left, top: obstacleRect.top},        // Top-left (offset upwards and to the left)
+            {left: obstacleRect.right, top: obstacleRect.top},       // Top-right (offset upwards and to the right)
+        ];
+
+        // Find the nearest offset corner
+        let nearestCorner = corners[0];
+        let minDistance = 500;
+        for (let corner of corners) {
+            let dx = corner.left - wormRect.left;
+            let dy = corner.top - wormRect.top;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestCorner = corner;
+            }
+        }
+        return nearestCorner;
     }
     
     function checkWormEating(worm, food, wormMovement) {
@@ -314,4 +362,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
     document.getElementById("pause-btn").addEventListener("click", togglePause);
 });
+
+
 
