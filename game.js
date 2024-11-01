@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let isPaused = false;
     let score = 0;
-    let timer = 30;
+    let timer = 3;
     const secondLevelTime = 60;
     let level = 1;
     let interval;
@@ -52,14 +52,19 @@ document.addEventListener("DOMContentLoaded", function () {
         timerDisplay.innerText = "Time: " + timer;
         levelDisplay.innerText = "Level: " + level;
 
-        if(localStorage.getItem("selectedLevel") == 2)
+        if(localStorage.getItem("selectedLevel") == 2) {
             nextLevel();
-
-        // Generate food items and start the timer
-        generateFoodItems();
-        generateObstacles();
-        spawnWorms();
-        startTimer();
+            // Generate food items and start the timer
+            generateFoodItems();
+            generateObstacles();
+        }
+        else{
+            // Generate food items and start the timer
+            generateFoodItems();
+            generateObstacles();
+            spawnWorms();
+            startTimer();
+        }
     }
 
     function startTimer() {
@@ -316,7 +321,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
     
-
     function nextLevel() {
         // Increase the level and difficulty
         level = 2;
@@ -325,9 +329,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Reset the timer
         timer = secondLevelTime;
         timerDisplay.innerText = "Time: " + timer;
-        
-        // Increase the game difficulty
-        increaseDifficulty();
         
         // Clear existing food and worms and obstacles
         foodItems.forEach(food => food.remove());
@@ -340,11 +341,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         worms = [];
         
+        // Increase the game difficulty
+        increaseDifficulty();
         // Generate new food items and start timer again
         generateFoodItems();
         generateObstacles();
-        spawnWorms();
-        startTimer();
     }
 
     function increaseDifficulty() {
@@ -356,21 +357,19 @@ document.addEventListener("DOMContentLoaded", function () {
         foodCountType2 = 5;
         level = 2;
     
-        // Increase worm movement speed slightly
-        wormSpeed = 3;
-    
         // Clear and reset the existing worm spawn interval with the updated, faster rate
         clearInterval(wormSpawnTimer);
         wormSpawnTimer = setInterval(spawnWorms, wormSpawnInterval);
     
         // Update the new game difficulty in logs for debugging
-        console.log("Difficulty increased: Worm Spawn Interval =", wormSpawnInterval, "Worm Speed =", wormSpeed, "Food Counts:", foodCountType1, foodCountType2);
+        console.log("Difficulty increased: Worm Spawn Interval =", wormSpawnInterval, "Food Counts:", foodCountType1, foodCountType2);
     }
 
     function togglePause() {
         if (isPaused) {
             // Resume the game
             startTimer(); // Restart the timer
+            clearInterval(wormSpawnTimer);
             spawnWorms();
             worms.forEach(worm => moveWorm(worm)); // Resume moving worms
 
@@ -426,6 +425,5 @@ document.addEventListener("DOMContentLoaded", function () {
             attempts++;
         }
     }
-    
     pauseButton.addEventListener("click", togglePause);
 })
