@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let interval;
     let foodItems = [];
     let worms = [];
+    let obstacles = [];
     let wormSpeed = 2;
     let foodCountType1 = 6;
     let foodCountType2 = 4;
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
             gameArea.appendChild(food);
             console.log("Food created:", food); // Debugging: log food creation
 
-            placeElementRandomly(food, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')]);
+            placeElementRandomly(food, gameArea, [...foodItems, ...obstacles]);
             foodItems.push(food);
         }
     }
@@ -81,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
             worm.style.left = "35%";
             worm.style.top = "15%";
 
-            placeElementRandomly(wormContainer, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')], "0px");
+            placeElementRandomly(wormContainer, gameArea, [...foodItems, ...obstacles], "0px");
             
             wormContainer.style.position = "absolute";
             wormContainer.appendChild(worm);
@@ -114,13 +115,14 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < obstacleCount; i++) {
             let obstacle = document.createElement("div");
             obstacle.classList.add("obstacle");
-            obstacle.style.width = "50px"; // Width of obstacle
+            obstacle.style.width = "40px"; // Width of obstacle
             obstacle.style.height = "10px"; // Height of obstacle
             obstacle.style.backgroundColor = "green"; // Color of the obstacle
             obstacle.style.position = "absolute";
             gameArea.appendChild(obstacle);
 
-            placeElementRandomly(obstacle, gameArea, [...foodItems, ...worms, ...document.querySelectorAll('.obstacle')]);
+            placeElementRandomly(obstacle, gameArea, [...foodItems, ...obstacles]);
+            obstacles.push(obstacle);
         }
     }
 
@@ -184,20 +186,54 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
     function endGame() {
-        clearInterval(interval);
-        alert("Game Over! Your score: " + score);
-        
-        // Optionally save the score to localStorage
-        let highscore1 = localStorage.getItem("highscore1") || 0;
-        let highscore2 = localStorage.getItem("highscore2") || 0;
-        
-        if (score > highscore1) {
-            localStorage.setItem("highscore1", score);
-        } else if (score > highscore2) {
-            localStorage.setItem("highscore2", score);
+        if (foodItems.length > 0 && level == 1) {
+            // If there is still food left, go to the next level instead of ending the game
+            nextLevel();
+        } else {
+            clearInterval(interval);
+            clearInterval(wormSpawnTimer);
+            alert("Game is Over! Your score: " + score);
+            
+            // Optionally save the score to localStorage
+            let highscore1 = localStorage.getItem("highscore1") || 0;
+            let highscore2 = localStorage.getItem("highscore2") || 0;
+            
+            if (score > highscore1 && level === 1) {
+                localStorage.setItem("highscore1", score);
+            } else if (score > highscore2 && level === 2) {
+                localStorage.setItem("highscore2", score);
+            }
+            window.location.href = "index.html"; // Redirect to start page
         }
+    }
 
-        window.location.href = "index.html"; // Redirect to start page
+    function nextLevel() {
+        // Increase the level and difficulty
+        level = 2;
+        levelDisplay.innerText = "Level: " + level;
+        
+        // Reset the timer
+        timer = 60;
+        timerDisplay.innerText = "Time: " + timer;
+        
+        // Increase the game difficulty
+        increaseDifficulty();
+        
+        // Clear existing food and worms and obstacles
+        foodItems.forEach(food => food.remove());
+        foodItems = [];
+        obstacles.forEach(obstacle => obstacle.remove());
+        obstacles = [];
+        worms.forEach(worm => {
+            clearInterval(worm.moveInterval);
+            worm.parentNode.remove();
+        });
+        worms = [];
+        
+        // Generate new food items and start timer again
+        generateFoodItems();
+        spawnWorms();
+        startTimer();
     }
 
     function increaseDifficulty() {
@@ -237,7 +273,11 @@ document.addEventListener("DOMContentLoaded", function () {
         isPaused = !isPaused; // Toggle the pause state
     }
 
-    function isOverlapping(element1, element2, minDistance = 20) {
+    function isOverlapping(element1, element2, minDistance = 30) {
+        const isObstacle = element1.classList.contains("obstacle") || element2.classList.contains("obstacle");
+        if(isObstacle)
+            minDistance += 20;
+
         const rect1 = element1.getBoundingClientRect();
         const rect2 = element2.getBoundingClientRect();
     
@@ -253,9 +293,13 @@ document.addEventListener("DOMContentLoaded", function () {
         let attempts = 0;
     
         while (!positionValid && attempts < 100) { // Limit to avoid infinite loops
-            element.style.left = Math.random() * (container.offsetWidth - element.offsetWidth) + "px";
-            // Set the top position randomly or with provided value
-            element.style.top = top !== null ? top : Math.random() * (container.offsetHeight - element.offsetHeight) + "px";
+            // Define a border margin for the elements
+            const borderMargin = 20; 
+            // Set the left position with border margin
+            element.style.left = Math.random() * (container.offsetWidth - element.offsetWidth - 2 * borderMargin) + borderMargin + "px";
+
+            // Set the top position with border margin
+            element.style.top = top !== null ? top : Math.random() * (container.offsetHeight - element.offsetHeight - 2 * borderMargin) + borderMargin + "px";
 
             positionValid = true;
             for (let existing of existingElements) {
@@ -270,3 +314,4 @@ document.addEventListener("DOMContentLoaded", function () {
     
     document.getElementById("pause-btn").addEventListener("click", togglePause);
 });
+
