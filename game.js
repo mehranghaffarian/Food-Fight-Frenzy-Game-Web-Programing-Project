@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     let isPaused = false;
     let score = 0;
-    let timer = 3;
-    const secondLevelTime = 60;
+    let timer = 20;
+    const secondLevelTime = 20;
     let level = 1;
     let interval;
     let foodItems = [];
@@ -288,20 +288,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function endGame() {
+        let highscore1 = localStorage.getItem("highscore1") || 0;
+        let highscore2 = localStorage.getItem("highscore2") || 0;
+        
+        if (score > highscore1 && level === 1) {
+            localStorage.setItem("highscore1", score);
+        } else if (score > highscore2 && level === 2) {
+            localStorage.setItem("highscore2", score);
+        }
         if (foodItems.length > 0 && level == 1) {
             nextLevel();
         } else {
             clearInterval(interval);
             clearInterval(wormSpawnTimer);
-            
-            let highscore1 = localStorage.getItem("highscore1") || 0;
-            let highscore2 = localStorage.getItem("highscore2") || 0;
-            
-            if (score > highscore1 && level === 1) {
-                localStorage.setItem("highscore1", score);
-            } else if (score > highscore2 && level === 2) {
-                localStorage.setItem("highscore2", score);
-            }
             
             // Show the final score in the dialog box
             document.getElementById("final-score").innerText = score;
